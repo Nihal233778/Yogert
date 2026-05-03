@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -141,7 +141,7 @@
             background: #0E111B;
             padding: 12px;
             border: 1px solid #2A2F44;
-            min-height: 180px;
+            min-height: 200px;
         }
 
         .static-header {
@@ -152,7 +152,8 @@
             color: #6C7896;
         }
 
-        #tads-random-container {
+        /* This is the CRITICAL container that tads expects */
+        #static-ad-container {
             min-height: 120px;
             display: flex;
             align-items: center;
@@ -174,6 +175,7 @@
         }
 
         .reward-btn:active { transform: scale(0.97); }
+        .reward-btn:disabled { opacity: 0.6; transform: none; }
 
         .info-message {
             background: #07090F80;
@@ -217,19 +219,16 @@
             margin-top: 12px;
         }
 
-        button {
-            background: none;
-            border: none;
-        }
-        
         .ad-placeholder {
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
             color: #6C7896;
+            background: #0E111B;
+            border-radius: 20px;
         }
     </style>
     
-    <!-- tads widget library - loads after Telegram SDK -->
+    <!-- tads widget library -->
     <script src="https://w.tads.me/widget.js"></script>
 </head>
 <body>
@@ -258,14 +257,14 @@
             </div>
         </div>
 
-        <div class="static-ad-wrapper" id="staticAdWrapper">
+        <div class="static-ad-wrapper">
             <div class="static-header">
                 <span>📢 sponsored content</span>
                 <span id="modeHint">⚡ static placement</span>
             </div>
-            <div id="tads-random-container">
-                <div class="ad-placeholder">✨ Ready for ad</div>
-            </div>
+            <!-- CRITICAL FIX: The tads library requires div with id="tads-container-YOUR_WIDGET_ID" -->
+            <div id="tads-container-9642"></div>
+            <div id="static-ad-container" style="display: none;"></div>
         </div>
 
         <button class="reward-btn" id="triggerAdButton">
@@ -283,16 +282,16 @@
         </div>
     </div>
     <footer>
-        ⚡ TMA • Random ad experience • v2.0
+        ⚡ TMA • Random ad experience • v3.0
     </footer>
 </div>
 
 <script>
     (function() {
-        // ============ REPLACE WITH YOUR REAL WIDGET IDs ============
-        // Get these from your tads.me dashboard
-        const STATIC_WIDGET_ID = "9642";      // Your static widget ID from screenshot
-        const FULLSCREEN_WIDGET_ID = "9643";  // Your fullscreen widget ID from screenshot
+        // ============ YOUR WIDGET IDs ============
+        // From your screenshot: 9642 (static), 9643 (fullscreen)
+        const STATIC_WIDGET_ID = "9642";
+        const FULLSCREEN_WIDGET_ID = "9643";
         
         const IS_DEBUG = true;
         
@@ -301,13 +300,13 @@
         let staticController = null;
         let fullscreenController = null;
         let tgWebApp = null;
+        let staticAdLoaded = false;
         
         // DOM elements
         const modeBadge = document.getElementById('randomModeBadge');
         const modeHint = document.getElementById('modeHint');
         const spinBtn = document.getElementById('spinRandomBtn');
         const triggerBtn = document.getElementById('triggerAdButton');
-        const staticContainer = document.getElementById('tads-random-container');
         const logDiv = document.getElementById('liveLogMessage');
         const tgStatusSpan = document.getElementById('tgStatus');
         
@@ -317,7 +316,6 @@
             const prefix = isError ? '❌' : '✅';
             const coloredMsg = `${prefix} [${time}] ${msg}`;
             logDiv.innerHTML = coloredMsg + '<br>' + logDiv.innerHTML;
-            // Keep limited log lines
             if (logDiv.children.length > 8) {
                 const lastChild = logDiv.lastElementChild;
                 if (lastChild) lastChild.remove();
@@ -325,57 +323,72 @@
             console.log(`[TMA] ${msg}`);
         }
         
-        // Clear static container
-        function clearStaticContainer() {
-            if (staticContainer) {
-                staticContainer.innerHTML = '';
-            }
-        }
-        
-        function showPlaceholder(text) {
-            clearStaticContainer();
-            const placeholder = document.createElement('div');
-            placeholder.className = 'ad-placeholder';
-            placeholder.innerText = text;
-            staticContainer.appendChild(placeholder);
-        }
-        
         // Initialize Telegram WebApp
         function initTelegramWebApp() {
             if (window.Telegram && window.Telegram.WebApp) {
                 tgWebApp = window.Telegram.WebApp;
-                tgWebApp.expand(); // Expand to full height
+                tgWebApp.expand();
                 tgWebApp.enableClosingConfirmation();
-                addLog(`✅ Telegram WebApp initialized | version: ${tgWebApp.version}`);
+                addLog(`✅ Telegram WebApp v${tgWebApp.version}`);
                 tgStatusSpan.innerHTML = '<span>✅</span> Telegram Connected';
                 tgStatusSpan.style.background = '#2A7F6E';
                 return true;
             } else {
-                addLog(`⚠️ Telegram WebApp not available - running in browser mode`, true);
-                tgStatusSpan.innerHTML = '<span>⚠️</span> Browser Mode (test)';
+                addLog(`⚠️ Browser mode (testing)`, true);
+                tgStatusSpan.innerHTML = '<span>⚠️</span> Browser Mode';
                 tgStatusSpan.style.background = '#7F6E2A';
                 return false;
             }
         }
         
-        // Initialize Static Controller (type: static)
+        // Callback when no ads found
+        const onAdsNotFoundStatic = () => {
+            addLog("📦 STATIC: No ads available", true);
+            const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
+            if (container) {
+                container.innerHTML = '<div class="ad-placeholder">😞 No ads available<br>Try again later</div>';
+            }
+            staticAdLoaded = false;
+        };
+        
+        // Callback for rewarded ad completion
+        const onShowRewardCallback = (result) => {
+            addLog(`🎉 REWARD GRANTED! User completed fullscreen ad`);
+            showRewardNotification("✨ +100 coins earned! ✨");
+            if (tgWebApp) {
+                tgWebApp.HapticFeedback.notificationOccurred('success');
+            }
+        };
+        
+        // Callback for fullscreen no ads
+        const onAdsNotFoundFull = () => {
+            addLog("🎬 FULLSCREEN: No ads available", true);
+        };
+        
+        // Initialize Static Controller (type: 'static')
         function initStaticController() {
             if (!window.tads) {
-                addLog("tads library not ready yet", true);
+                addLog("Waiting for tads library...", true);
                 return false;
             }
             
-            const onAdsNotFound = () => {
-                addLog("📦 STATIC: No ads available", true);
-                showPlaceholder("😞 No static ads available right now");
-            };
-            
             try {
+                // The tads library will look for div with id="tads-container-9642"
+                // Make sure it exists
+                let container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
+                if (!container) {
+                    addLog(`Creating missing container for static ad`, true);
+                    const wrapper = document.querySelector('.static-ad-wrapper');
+                    container = document.createElement('div');
+                    container.id = `tads-container-${STATIC_WIDGET_ID}`;
+                    if (wrapper) wrapper.appendChild(container);
+                }
+                
                 staticController = window.tads.init({
                     widgetId: STATIC_WIDGET_ID,
                     type: 'static',
                     debug: IS_DEBUG,
-                    onAdsNotFound: onAdsNotFound
+                    onAdsNotFound: onAdsNotFoundStatic
                 });
                 addLog(`✅ Static controller ready (ID: ${STATIC_WIDGET_ID})`);
                 return true;
@@ -385,30 +398,17 @@
             }
         }
         
-        // Initialize Fullscreen Controller (type: fullscreen)
+        // Initialize Fullscreen Controller (type: 'fullscreen')
         function initFullscreenController() {
             if (!window.tads) return false;
-            
-            const onShowReward = (result) => {
-                addLog(`🎉🎁 REWARD GRANTED! User watched fullscreen ad`);
-                // Give reward to user
-                showRewardNotification("✨ +100 points! ✨");
-                if (tgWebApp) {
-                    tgWebApp.HapticFeedback.notificationOccurred('success');
-                }
-            };
-            
-            const onAdsNotFound = () => {
-                addLog("🎬 FULLSCREEN: No ads available", true);
-            };
             
             try {
                 fullscreenController = window.tads.init({
                     widgetId: FULLSCREEN_WIDGET_ID,
                     type: 'fullscreen',
                     debug: IS_DEBUG,
-                    onShowReward: onShowReward,
-                    onAdsNotFound: onAdsNotFound
+                    onShowReward: onShowRewardCallback,
+                    onAdsNotFound: onAdsNotFoundFull
                 });
                 addLog(`✅ Fullscreen controller ready (ID: ${FULLSCREEN_WIDGET_ID})`);
                 return true;
@@ -434,47 +434,39 @@
             notif.style.zIndex = '9999';
             notif.style.fontSize = '16px';
             notif.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+            notif.style.animation = 'fadeInUp 0.3s ease';
             document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 2500);
+            setTimeout(() => {
+                notif.style.opacity = '0';
+                setTimeout(() => notif.remove(), 300);
+            }, 2500);
         }
         
-        // Display static ad
+        // Display static ad according to official documentation
         async function displayStaticAd() {
             if (!staticController) {
                 addLog("Reinitializing static controller...");
                 initStaticController();
                 if (!staticController) {
-                    showPlaceholder("⚠️ Controller unavailable");
+                    addLog("Static controller unavailable", true);
                     return false;
                 }
             }
-            
-            showPlaceholder("🔄 Loading ad...");
             
             try {
                 addLog("Loading static ad...");
                 await staticController.loadAd();
                 addLog("Static ad loaded, displaying...");
-                
-                // Create the container div that tads expects
-                const containerId = `tads-container-${STATIC_WIDGET_ID}`;
-                let existingContainer = document.getElementById(containerId);
-                if (!existingContainer) {
-                    existingContainer = document.createElement('div');
-                    existingContainer.id = containerId;
-                    clearStaticContainer();
-                    staticContainer.appendChild(existingContainer);
-                } else if (!staticContainer.contains(existingContainer)) {
-                    clearStaticContainer();
-                    staticContainer.appendChild(existingContainer);
-                }
-                
                 await staticController.showAd();
                 addLog("✅ Static ad displayed successfully!");
+                staticAdLoaded = true;
                 return true;
             } catch(err) {
                 addLog(`Static ad error: ${err.message || err}`, true);
-                showPlaceholder("⚠️ Ad failed to load\nTry again");
+                const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
+                if (container) {
+                    container.innerHTML = '<div class="ad-placeholder">⚠️ Ad failed to load<br>Tap button again</div>';
+                }
                 return false;
             }
         }
@@ -507,13 +499,11 @@
         async function triggerCurrentAd() {
             addLog(`🎯 Triggering ${currentAdMode.toUpperCase()} mode ad`);
             
-            // Haptic feedback if available
             if (tgWebApp) {
                 tgWebApp.HapticFeedback.impactOccurred('medium');
             }
             
             triggerBtn.disabled = true;
-            triggerBtn.style.opacity = '0.7';
             
             try {
                 if (currentAdMode === 'static') {
@@ -522,12 +512,11 @@
                     await displayFullscreenAd();
                 }
             } catch(err) {
-                addLog(`Unexpected error: ${err}`, true);
+                addLog(`Unexpected error: ${err.message}`, true);
             } finally {
                 setTimeout(() => {
                     triggerBtn.disabled = false;
-                    triggerBtn.style.opacity = '1';
-                }, 1500);
+                }, 2000);
             }
         }
         
@@ -540,27 +529,33 @@
                 modeBadge.innerHTML = '📦 STATIC MODE';
                 modeBadge.style.background = "#2c3152";
                 modeHint.innerHTML = '📦 static banner mode';
-                showPlaceholder("✨ Click main button to load banner ad");
                 addLog(`🎲 Random mode: STATIC`);
             } else {
                 modeBadge.innerHTML = '🎬 FULLSCREEN MODE';
                 modeBadge.style.background = "#7F4E2E";
                 modeHint.innerHTML = '🎬 rewarded video mode';
-                showPlaceholder("🎬 Fullscreen mode active\nClick button to watch & earn");
                 addLog(`🎲 Random mode: FULLSCREEN`);
+            }
+            
+            // Clear static container when switching to fullscreen
+            if (currentAdMode === 'fullscreen') {
+                const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
+                if (container) {
+                    container.innerHTML = '<div class="ad-placeholder">🎬 Fullscreen mode active<br>Click button for rewarded ad</div>';
+                }
             }
         }
         
         // Initialize everything
         async function initialize() {
-            addLog("Initializing Random Ad TMA...");
+            addLog("Initializing Random Ad TMA v3...");
             
-            // First init Telegram
+            // Init Telegram
             initTelegramWebApp();
             
-            // Wait a bit for tads to be ready
+            // Wait for tads library
             let retries = 0;
-            while (!window.tads && retries < 10) {
+            while (!window.tads && retries < 15) {
                 await new Promise(r => setTimeout(r, 200));
                 retries++;
             }
@@ -570,13 +565,29 @@
                 initStaticController();
                 initFullscreenController();
             } else {
-                addLog("⚠️ tads library timeout - check network", true);
+                addLog("⚠️ tads library not loaded - check network", true);
             }
             
             // Initial random mode
             randomizeAdMode();
             addLog("Ready! Click REROLL to change ad type");
         }
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Event listeners
         spinBtn.addEventListener('click', () => {
@@ -595,15 +606,12 @@
         // Start the app
         initialize();
         
-        // Handle visibility change (Telegram back button etc)
+        // Telegram ready
         if (window.Telegram && window.Telegram.WebApp) {
-            const webapp = window.Telegram.WebApp;
-            webapp.onEvent('viewportChanged', () => {
-                addLog("Viewport changed");
-            });
-            webapp.ready();
+            window.Telegram.WebApp.ready();
         }
     })();
 </script>
 </body>
-</html>                                              
+</html>                                                
+            
