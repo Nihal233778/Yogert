@@ -1,617 +1,571 @@
+                
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>RewardSpin — Random Ad TMA</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>tads Publisher TMA · Personal blog widgets</title>
     <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+    <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
+    <!-- tads widget (must be loaded before usage) -->
+    <script src="https://w.tads.me/widget.js"></script>
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            background: linear-gradient(145deg, #1a1e2b 0%, #0f121c 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            max-width: 460px;
-            width: 100%;
-            background: rgba(22, 26, 40, 0.85);
-            backdrop-filter: blur(8px);
-            border-radius: 56px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-        }
-
-        .hero {
-            padding: 32px 24px 24px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .icon-badge {
-            background: #2a2f42;
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            margin: 0;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            transition: background 0.2s ease;
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #FFF, #B9C8FF);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 620;
+            letter-spacing: -0.3px;
         }
 
-        .sub {
-            color: #8E98B2;
-            margin-top: 12px;
+        .subtitle {
             font-size: 14px;
+            color: var(--tg-theme-hint-color, #8e8e93);
+            margin-bottom: 20px;
+            border-left: 3px solid var(--tg-theme-button-color, #40a7e3);
+            padding-left: 12px;
         }
 
-        .ad-zone {
-            padding: 28px 20px 24px;
-        }
-
-        .random-panel {
-            background: #0E111B;
-            border-radius: 32px;
-            padding: 16px 18px;
+        .quick-select {
+            display: flex;
+            gap: 12px;
             margin-bottom: 24px;
-            border: 1px solid rgba(255,255,255,0.08);
+            flex-wrap: wrap;
         }
 
-        .random-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: #C0CCF0;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        .random-title span {
-            background: #2A2F44;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 12px;
-        }
-
-        .dice-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .random-indicator {
-            background: #00000060;
-            border-radius: 60px;
-            padding: 10px 20px;
-            font-weight: 700;
-            font-size: 16px;
-            color: #FFD966;
+        .widget-btn {
             flex: 1;
+            min-width: 140px;
+            padding: 12px 10px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f2);
+            border: 1.5px solid var(--tg-theme-button-color, #40a7e3);
+            border-radius: 60px;
+            color: var(--tg-theme-text-color, #000000);
+            font-weight: 590;
+            cursor: pointer;
+            transition: all 0.2s ease;
             text-align: center;
-        }
-
-        .randomize-btn {
-            background: linear-gradient(105deg, #3A3F62, #262B44);
-            border: none;
-            padding: 10px 24px;
-            border-radius: 60px;
-            font-weight: 600;
-            color: white;
             font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
         }
 
-        .randomize-btn:active { transform: scale(0.96); }
-
-        .static-ad-wrapper {
-            margin: 16px 0 20px;
-            border-radius: 28px;
-            background: #0E111B;
-            padding: 12px;
-            border: 1px solid #2A2F44;
-            min-height: 200px;
+        .widget-btn:hover, .widget-btn.active {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border-color: transparent;
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .static-header {
-            display: flex;
-            justify-content: space-between;
-            padding: 0 8px 10px;
-            font-size: 11px;
-            color: #6C7896;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .reward-btn {
-            background: linear-gradient(105deg, #F2C94C, #F2994A);
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--tg-theme-hint-color, #6c6c70);
+        }
+
+        input, select, textarea {
             width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--tg-theme-hint-color, #d9d9e3);
+            border-radius: 14px;
+            background: var(--tg-theme-secondary-bg-color, #f9f9fb);
+            color: var(--tg-theme-text-color, #000000);
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #40a7e3);
+            box-shadow: 0 0 0 2px rgba(64, 167, 227, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: var(--tg-theme-button-text-color, #ffffff);
             border: none;
-            padding: 18px 0;
-            font-size: 18px;
-            font-weight: 700;
             border-radius: 60px;
-            color: #1C1E2A;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: opacity 0.2s, transform 0.1s;
             margin-top: 8px;
         }
 
-        .reward-btn:active { transform: scale(0.97); }
-        .reward-btn:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+        button:active {
+            opacity: 0.85;
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        #adSection {
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid var(--tg-theme-hint-color, #e5e5ea);
+        }
+
+        #staticAdContainer {
+            min-height: 120px;
+            margin: 16px 0;
+            border-radius: 20px;
+            background: var(--tg-theme-secondary-bg-color, #fafafc);
+            padding: 8px;
+        }
+
+        #fullscreenTrigger {
+            margin-top: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .success-message {
+            background: #34c759;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #ff3b30;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
         .info-message {
-            background: #07090F80;
-            border-radius: 20px;
-            padding: 12px 16px;
-            margin-top: 20px;
-            font-size: 12px;
+            background: #007aff;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 60px;
+            margin-bottom: 20px;
             text-align: center;
-            color: #98A1C2;
         }
 
-        .debug-log {
-            font-family: monospace;
-            font-size: 10px;
-            background: #03050b;
-            margin-top: 16px;
-            padding: 10px 12px;
+        .debug-box {
+            background: #1c1c1e;
+            color: #66ff99;
+            padding: 12px;
             border-radius: 16px;
-            color: #70d6ff;
-            word-break: break-all;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-
-        footer {
-            padding: 18px 24px 26px;
-            text-align: center;
-            font-size: 10px;
-            color: #4E5677;
-            border-top: 1px solid rgba(255,255,255,0.04);
-        }
-
-        .telegram-status {
-            background: #2A7F6E30;
-            border-radius: 20px;
-            padding: 6px 12px;
+            font-family: 'SF Mono', monospace;
             font-size: 11px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 12px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #2c2c2e;
         }
 
-        .ad-placeholder {
-            padding: 30px 20px;
-            text-align: center;
-            color: #6C7896;
-            background: #0E111B;
-            border-radius: 20px;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
+        .widget-badge {
+            background: var(--tg-theme-button-color, #40a7e3);
+            color: white;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-block;
+            margin-left: 10px;
         }
     </style>
-    
-    <!-- tads widget library -->
-    <script src="https://w.tads.me/widget.js"></script>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="hero">
-        <div class="icon-badge">🎲✨</div>
-        <h1>Random Ad Challenge</h1>
-        <div class="sub">Spin to change ad format • Earn rewards</div>
-        <div class="telegram-status" id="tgStatus">
-            <span>🔌</span> Connecting to Telegram...
-        </div>
+    <h1>🧪 tads Publisher Sandbox</h1>
+    <div class="subtitle">
+        📋 Dashboard widgets: <strong>#9613 (Personal blog)</strong> | <strong>#9643(Personal blog1)</strong> — TGB / Fullscreen ready
     </div>
 
-    <div class="ad-zone">
-        <div class="random-panel">
-            <div class="random-title">
-                🎲 RANDOM AD MODE
-                <span>click REROLL</span>
-            </div>
-            <div class="dice-area">
-                <div class="random-indicator" id="randomModeBadge">📦 STATIC</div>
-                <button class="randomize-btn" id="spinRandomBtn">
-                    🔄 REROLL
-                </button>
-            </div>
-        </div>
+    <div id="debugContainer" class="debug-box hidden"></div>
 
-        <div class="static-ad-wrapper">
-            <div class="static-header">
-                <span>📢 sponsored content</span>
-                <span id="modeHint">⚡ static placement</span>
-            </div>
-            <!-- CRITICAL: This div MUST exist and have the exact ID format: tads-container-YOUR_WIDGET_ID -->
-            <div id="tads-container-9642" style="min-height: 120px;"></div>
-        </div>
-
-        <button class="reward-btn" id="triggerAdButton">
-            🎁 GET RANDOM REWARD 🎁
-        </button>
-
-        <div class="info-message">
-            💡 <strong>Random Mode Active</strong><br>
-            📦 <strong>STATIC</strong> → shows inline banner ad<br>
-            🎬 <strong>FULLSCREEN</strong> → shows rewarded video ad
-        </div>
-        
-        <div id="liveLogMessage" class="debug-log">
-            🧠 Initializing...
-        </div>
+    <div class="quick-select">
+        <div class="widget-btn" data-widget="9642" data-name="Personal blog">📰 #9642· Personal blog</div>
+        <div class="widget-btn" data-widget="9643" data-name="Personal blog1">✍️ #9643 · Personal blog1</div>
     </div>
-    <footer>
-        ⚡ TMA • Random ad experience • v3.0
-    </footer>
-</div>
 
-<script>
-    (function() {
-        // ============ YOUR WIDGET IDs (from screenshot) ============
-        const STATIC_WIDGET_ID = "9642";
-        const FULLSCREEN_WIDGET_ID = "9643";
-        const IS_DEBUG = false;
-        
-        // ============ GLOBALS ============
-        let currentAdMode = 'static';
-        let staticController = null;
-        let fullscreenController = null;
-        let tgWebApp = null;
-        
-        // DOM elements
-        const modeBadge = document.getElementById('randomModeBadge');
-        const modeHint = document.getElementById('modeHint');
-        const spinBtn = document.getElementById('spinRandomBtn');
-        const triggerBtn = document.getElementById('triggerAdButton');
-        const logDiv = document.getElementById('liveLogMessage');
-        const tgStatusSpan = document.getElementById('tgStatus');
-        
-        // Helper: add log message
-        function addLog(msg, isError = false) {
-            const time = new Date().toLocaleTimeString();
-            const prefix = isError ? '❌' : '✅';
-            const logMsg = `${prefix} [${time}] ${msg}`;
-            logDiv.innerHTML = logMsg + '<br>' + logDiv.innerHTML;
-            if (logDiv.children.length > 8) {
-                const lastChild = logDiv.lastElementChild;
-                if (lastChild) lastChild.remove();
-            }
-            console.log(`[TMA] ${msg}`);
-        }
-        
-        // Initialize Telegram WebApp
-        function initTelegramWebApp() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                tgWebApp = window.Telegram.WebApp;
-                tgWebApp.expand();
-                tgWebApp.enableClosingConfirmation();
-                addLog(`✅ Telegram WebApp v${tgWebApp.version}`);
-                tgStatusSpan.innerHTML = '<span>✅</span> Telegram Connected';
-                tgStatusSpan.style.background = '#2A7F6E';
-                return true;
-            } else {
-                addLog(`⚠️ Browser mode (testing)`, true);
-                tgStatusSpan.innerHTML = '<span>⚠️</span> Browser Mode';
-                tgStatusSpan.style.background = '#7F6E2A';
-                return false;
-            }
-        }
-        
-        // Callback when no static ads found
-        const onAdsNotFoundStatic = () => {
-            addLog("📦 STATIC: No ads available from network", true);
-            const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
-            if (container) {
-                container.innerHTML = '<div class="ad-placeholder">😞 No ads available<br>Please try again later</div>';
-            }
-        };
-        
-        // Callback for rewarded ad completion
-        const onShowRewardCallback = (result) => {
-            addLog(`🎉 REWARD GRANTED! +100 points!`);
-            showRewardNotification("✨ +100 coins earned! ✨");
-            if (tgWebApp) {
-                tgWebApp.HapticFeedback.notificationOccurred('success');
-            }
-        };
-        
-        // Callback for fullscreen no ads
-        const onAdsNotFoundFull = () => {
-            addLog("🎬 FULLSCREEN: No ads available", true);
-        };
-        
-        // Initialize Static Controller - following original documentation EXACTLY
-        function initStaticController() {
-            if (!window.tads) {
-                addLog("tads library not ready", true);
-                return false;
-            }
-            
-            // CRITICAL: Ensure the container div exists BEFORE initialization
-            const containerId = `tads-container-${STATIC_WIDGET_ID}`;
-            let container = document.getElementById(containerId);
-            
-            if (!container) {
-                addLog(`Creating container div: ${containerId}`, true);
-                container = document.createElement('div');
-                container.id = containerId;
-                const wrapper = document.querySelector('.static-ad-wrapper');
-                if (wrapper) {
-                    wrapper.appendChild(container);
+    <form id="adForm">
+        <div class="form-group">
+            <label for="widgetId">🆔 Widget ID *</label>
+            <input type="text" id="widgetId" name="widgetId" required value="9642" placeholder="9642or 9643">
+        </div>
+
+        <div class="form-group">
+            <label for="adType">📦 Ad Format</label>
+            <select id="adType" name="adType">
+                <option value="static" selected>📄 Text-Graphic Block (TGB)</option>
+                <option value="fullscreen">🖥️ Fullscreen Banner</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="rewardType">🎁 Reward Type</label>
+            <select id="rewardType" name="rewardType">
+                <option value="rewarded">🏆 Rewarded (click/view reward)</option>
+                <option value="non-rewarded">🔹 Non-rewarded</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="name">📛 Name</label>
+            <input type="text" id="name" name="name" value="Personal blog">
+        </div>
+
+        <div class="form-group">
+            <label for="description">📝 Description</label>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9673 (Personal blog)</textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">🚀 Load Ad</button>
+    </form>
+
+    <div id="adSection" class="hidden">
+        <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            🎯 Ad Preview 
+            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
+        </h2>
+        <div id="staticAdContainer"></div>
+        <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <script>
+        (function() {
+            // catch unhandled rejections to avoid silent crashes
+            window.addEventListener('unhandledrejection', function(event) {
+                console.error('[TADS] Unhandled promise rejection:', event.reason);
+            });
+
+            // ---------- Debug logger ----------
+            function debugLog(...args) {
+                console.log('[TADS-TEST]', ...args);
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) {
+                    debugDiv.classList.remove('hidden');
+                    const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+                    const line = args.map(arg => {
+                        try {
+                            if (arg === null) return 'null';
+                            if (arg === undefined) return 'undefined';
+                            if (arg instanceof Error) return `${arg.name}: ${arg.message}`;
+                            if (typeof arg === 'object') return JSON.stringify(arg);
+                            return String(arg);
+                        } catch(e) { return '[unserializable]'; }
+                    }).join(' ');
+                    debugDiv.innerHTML += `[${timestamp}] ${line}\n`;
+                    debugDiv.scrollTop = debugDiv.scrollHeight;
                 }
             }
-            
-            // Clear any existing content
-            container.innerHTML = '';
-            
-            try {
-                // Initialize exactly as per documentation
-                staticController = window.tads.init({
-                    widgetId: STATIC_WIDGET_ID,
-                    type: 'static',
-                    debug: IS_DEBUG,
-                    onAdsNotFound: onAdsNotFoundStatic
+
+            function clearDebug() {
+                const debugDiv = document.getElementById('debugContainer');
+                if (debugDiv) debugDiv.innerHTML = '';
+                debugLog('Debug panel cleared');
+            }
+
+            // Telegram WebApp init
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+                debugLog('Telegram WebApp ready, theme applied');
+            }
+
+            // DOM elements
+            const form = document.getElementById('adForm');
+            const widgetIdInput = document.getElementById('widgetId');
+            const adTypeSelect = document.getElementById('adType');
+            const rewardTypeSelect = document.getElementById('rewardType');
+            const nameInput = document.getElementById('name');
+            const descInput = document.getElementById('description');
+            const submitBtn = document.getElementById('submitBtn');
+            const adSection = document.getElementById('adSection');
+            const staticContainer = document.getElementById('staticAdContainer');
+            const fullscreenBtn = document.getElementById('fullscreenTrigger');
+            const msgContainer = document.getElementById('messageContainer');
+            const activeWidgetBadge = document.getElementById('activeWidgetBadge');
+            const widgetBtns = document.querySelectorAll('.widget-btn');
+
+            // State
+            let currentAdController = null;
+            let currentWidgetId = '9642';
+            let noAdsHandled = false;
+
+            // ---------- UI Helpers ----------
+            function showMessage(type, text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = type === 'success' ? 'success-message' : (type === 'info' ? 'info-message' : 'error-message');
+                msgDiv.textContent = text;
+                msgContainer.innerHTML = '';
+                msgContainer.appendChild(msgDiv);
+                setTimeout(() => msgDiv.remove(), 4500);
+            }
+
+            function resetAdUI() {
+                debugLog('Resetting ad UI & destroying controller');
+                adSection.classList.add('hidden');
+                staticContainer.innerHTML = '';
+                fullscreenBtn.classList.add('hidden');
+                if (currentAdController && typeof currentAdController.destroy === 'function') {
+                    try { currentAdController.destroy(); } catch(e) { debugLog('destroy error', e); }
+                }
+                currentAdController = null;
+                noAdsHandled = false;
+            }
+
+            function setActiveWidgetUI(widgetId) {
+                widgetBtns.forEach(btn => {
+                    if (btn.dataset.widget === widgetId) btn.classList.add('active');
+                    else btn.classList.remove('active');
                 });
-                addLog(`✅ Static controller initialized (Widget: ${STATIC_WIDGET_ID})`);
-                return true;
-            } catch(err) {
-                addLog(`Static init error: ${err.message}`, true);
-                return false;
+                if (activeWidgetBadge) activeWidgetBadge.textContent = `#${widgetId}`;
+                currentWidgetId = widgetId;
+                debugLog(`Active widget switched to #${widgetId}`);
             }
-        }
-        
-        // Initialize Fullscreen Controller
-        function initFullscreenController() {
-            if (!window.tads) return false;
-            
-            try {
-                fullscreenController = window.tads.init({
-                    widgetId: FULLSCREEN_WIDGET_ID,
-                    type: 'fullscreen',
-                    debug: IS_DEBUG,
-                    onShowReward: onShowRewardCallback,
-                    onAdsNotFound: onAdsNotFoundFull
+
+            // ---------- tads readiness check ----------
+            function isTadsReady() {
+                return !!(window.tads && typeof window.tads.init === 'function');
+            }
+
+            function waitForTads(timeout = 8000) {
+                return new Promise((resolve, reject) => {
+                    if (isTadsReady()) return resolve();
+                    debugLog('Waiting for tads.me/widget.js to become available...');
+                    const start = Date.now();
+                    const interval = setInterval(() => {
+                        if (isTadsReady()) {
+                            clearInterval(interval);
+                            debugLog('tads library ready');
+                            resolve();
+                        } else if (Date.now() - start > timeout) {
+                            clearInterval(interval);
+                            reject(new Error('tads script did not load in time'));
+                        }
+                    }, 100);
                 });
-                addLog(`✅ Fullscreen controller initialized (Widget: ${FULLSCREEN_WIDGET_ID})`);
-                return true;
-            } catch(err) {
-                addLog(`Fullscreen init error: ${err.message}`, true);
-                return false;
             }
-        }
-        
-        // Show reward notification
-        function showRewardNotification(msg) {
-            const notif = document.createElement('div');
-            notif.innerText = msg;
-            notif.style.position = 'fixed';
-            notif.style.bottom = '80px';
-            notif.style.left = '50%';
-            notif.style.transform = 'translateX(-50%)';
-            notif.style.background = '#F2C94C';
-            notif.style.color = '#1C1E2A';
-            notif.style.padding = '12px 24px';
-            notif.style.borderRadius = '60px';
-            notif.style.fontWeight = 'bold';
-            notif.style.zIndex = '9999';
-            notif.style.fontSize = '16px';
-            notif.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
-            notif.style.animation = 'fadeInUp 0.3s ease';
-            document.body.appendChild(notif);
-            setTimeout(() => {
-                notif.style.opacity = '0';
-                setTimeout(() => notif.remove(), 300);
-            }, 2500);
-        }
-        
-        // Display static ad - following original documentation EXACTLY
-        async function displayStaticAd() {
-            if (!staticController) {
-                addLog("Reinitializing static controller...");
-                if (!initStaticController()) {
-                    addLog("Failed to initialize static controller", true);
-                    return false;
+
+            function normalizeWidgetId(id) {
+                return id.toString().replace(/^#/, '').trim();
+            }
+
+            // ---------- Core ad loader (fixed container convention) ----------
+            async function loadAd(widgetId, adType, rewardType) {
+                clearDebug();
+                debugLog(`loadAd start — widget:${widgetId}, type:${adType}, reward:${rewardType}`);
+                noAdsHandled = false;
+
+                try {
+                    await waitForTads();
+                    const normalizedId = normalizeWidgetId(widgetId);
+                    if (!normalizedId) throw new Error('Empty widget ID');
+
+                    resetAdUI();
+                    setActiveWidgetUI(normalizedId);
+
+                    // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
+                    if (adType === 'static') {
+                        const requiredContainerId = `tads-container-${normalizedId}`;
+                        debugLog(`Creating static container with ID: ${requiredContainerId}`);
+                        staticContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
+                        const containerEl = document.getElementById(requiredContainerId);
+                        if (!containerEl) {
+                            throw new Error(`Failed to create container #${requiredContainerId}`);
+                        }
+                        debugLog(`Container verified: ${!!containerEl}`);
+                    }
+
+                    // Define callbacks
+                    const onAdsNotFound = () => {
+                        debugLog(`onAdsNotFound triggered for ${normalizedId}`);
+                        if (!noAdsHandled) {
+                            noAdsHandled = true;
+                            showMessage('info', `ℹ️ No active campaigns for Widget #${normalizedId} right now.`);
+                            adSection.classList.add('hidden');
+                        }
+                    };
+
+                    let onClickReward = null;
+                    let onShowReward = null;
+
+                    if (rewardType === 'rewarded') {
+                        if (adType === 'static') {
+                            onClickReward = (adId, extra) => {
+                                debugLog(`🎁 Click reward received! adId: ${adId}`, extra);
+                                showMessage('success', `🎉 Click reward granted for #${normalizedId}`);
+                            };
+                        } else if (adType === 'fullscreen') {
+                            onShowReward = (result) => {
+                                debugLog(`🎬 Fullscreen view reward:`, result);
+                                showMessage('success', `🏅 Fullscreen reward delivered for #${normalizedId}`);
+                            };
+                        }
+                    }
+
+                    debugLog(`Initializing tads with widgetId=${normalizedId}, type=${adType}`);
+                    const controller = window.tads.init({
+                        widgetId: normalizedId,
+                        type: adType,
+                        debug: false,        // set to false for cleaner production, logs are handled by us
+                        onClickReward: onClickReward,
+                        onShowReward: onShowReward,
+                        onAdsNotFound: onAdsNotFound
+                    });
+
+                    currentAdController = controller;
+                    debugLog(`Controller obtained: ${!!currentAdController}`);
+
+                    if (adType === 'static') {
+                        debugLog('Calling loadAd() on controller...');
+                        await currentAdController.loadAd();
+                        debugLog('loadAd() resolved');
+                        await currentAdController.showAd();
+                        debugLog('showAd() resolved — ad should be displayed');
+                        adSection.classList.remove('hidden');
+                        showMessage('success', `✅ TGB ad loaded for #${normalizedId}`);
+                    } 
+                    else if (adType === 'fullscreen') {
+                        // fullscreen: prepare button and UI
+                        staticContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity:0.7;">✨ Fullscreen ad ready — tap button below</div>';
+                        fullscreenBtn.classList.remove('hidden');
+                        adSection.classList.remove('hidden');
+
+                        // Replace button to avoid duplicate listeners
+                        const newFullBtn = fullscreenBtn.cloneNode(true);
+                        fullscreenBtn.parentNode.replaceChild(newFullBtn, fullscreenBtn);
+                        const updatedFullBtn = document.getElementById('fullscreenTrigger');
+                        
+                        updatedFullBtn.addEventListener('click', async () => {
+                            if (!currentAdController) {
+                                showMessage('error', 'Controller missing, reload ad first');
+                                return;
+                            }
+                            try {
+                                debugLog('User triggered fullscreen showAd()');
+                                await currentAdController.showAd();
+                                debugLog('Fullscreen ad interaction finished');
+                            } catch (err) {
+                                debugLog('Fullscreen showAd error:', err);
+                                if (!noAdsHandled) {
+                                    noAdsHandled = true;
+                                    showMessage('info', `No fullscreen fill for #${normalizedId}`);
+                                }
+                            }
+                        });
+                        showMessage('success', `📱 Fullscreen ready for #${normalizedId}`);
+                    }
+                } catch (err) {
+                    debugLog('CRITICAL ERROR in loadAd:', err);
+                    const errorMsg = err?.message || String(err);
+                    if (!noAdsHandled && !errorMsg.includes('onAdsNotFound')) {
+                        showMessage('error', `Ad error: ${errorMsg.substring(0, 120)}`);
+                        resetAdUI();
+                    } else if (noAdsHandled) {
+                        debugLog('No ads callback already handled, ignoring error toast');
+                        adSection.classList.add('hidden');
+                    } else {
+                        showMessage('error', `Failed: ${errorMsg}`);
+                        resetAdUI();
+                    }
+                } finally {
+                    debugLog('loadAd finished');
                 }
             }
-            
-            // CRITICAL: Ensure container exists and is empty before showing ad
-            const containerId = `tads-container-${STATIC_WIDGET_ID}`;
-            let container = document.getElementById(containerId);
-            
-            if (!container) {
-                addLog(`Container ${containerId} missing, creating...`, true);
-                container = document.createElement('div');
-                container.id = containerId;
-                const wrapper = document.querySelector('.static-ad-wrapper');
-                if (wrapper) {
-                    wrapper.appendChild(container);
-                } else {
-                    addLog("Wrapper not found!", true);
-                    return false;
+
+            // ---------- Quick select buttons (matching screenshot #9613, #9614) ----------
+            widgetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const wid = btn.dataset.widget;
+                    const wName = btn.dataset.name;
+                    if (wid) {
+                        widgetIdInput.value = wid;
+                        nameInput.value = wName || '';
+                        if (wid === '9642') descInput.value = 'Blog widget from dashboard #9642 — Personal blog (TGB)';
+                        else if (wid === '9643') descInput.value = 'Blog widget from dashboard #9643— Personal blog1 (TGB)';
+                        setActiveWidgetUI(wid);
+                        showMessage('success', `Selected ${wName} (#${wid})`);
+                        resetAdUI();   // clear previous ad preview
+                    }
+                });
+            });
+
+            // ---------- Form submission ----------
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const widgetRaw = widgetIdInput.value.trim();
+                const adType = adTypeSelect.value;
+                const rewardType = rewardTypeSelect.value;
+
+                if (!widgetRaw) {
+                    showMessage('error', 'Please enter a Widget ID');
+                    return;
                 }
-            }
-            
-            // Clear container for fresh ad
-            container.innerHTML = '<div style="padding: 20px; text-align: center; color: #6C7896;">Loading ad...</div>';
-            
-            try {
-                addLog("Calling loadAd()...");
-                await staticController.loadAd();
-                addLog("loadAd() successful, calling showAd()...");
-                await staticController.showAd();
-                addLog("✅ Static ad displayed successfully!");
-                return true;
-            } catch(err) {
-                addLog(`Static ad error: ${err.message || err}`, true);
-                container.innerHTML = '<div class="ad-placeholder">⚠️ Ad failed to load<br>Tap button again</div>';
-                return false;
-            }
-        }
-        
-        // Display fullscreen ad
-        async function displayFullscreenAd() {
-            if (!fullscreenController) {
-                addLog("Reinitializing fullscreen controller...");
-                if (!initFullscreenController()) {
-                    addLog("Failed to initialize fullscreen controller", true);
-                    return false;
-                }
-            }
-            
-            try {
-                addLog("Calling loadAd() for fullscreen...");
-                await fullscreenController.loadAd();
-                addLog("loadAd() successful, calling showAd()...");
-                await fullscreenController.showAd();
-                addLog("✅ Fullscreen ad completed");
-                return true;
-            } catch(err) {
-                addLog(`Fullscreen error: ${err.message || err}`, true);
-                return false;
-            }
-        }
-        
-        // Main action based on current mode
-        async function triggerCurrentAd() {
-            addLog(`🎯 Triggering ${currentAdMode.toUpperCase()} mode ad`);
-            
-            if (tgWebApp) {
-                tgWebApp.HapticFeedback.impactOccurred('medium');
-            }
-            
-            triggerBtn.disabled = true;
-            
-            try {
-                if (currentAdMode === 'static') {
-                    await displayStaticAd();
-                } else {
-                    await displayFullscreenAd();
-                }
-            } catch(err) {
-                addLog(`Unexpected error: ${err.message}`, true);
-            } finally {
-                setTimeout(() => {
-                    triggerBtn.disabled = false;
-                }, 2000);
-            }
-        }
-        
-        // Randomize ad mode
-        function randomizeAdMode() {
-            const randomVal = Math.random();
-            currentAdMode = randomVal < 0.5 ? 'static' : 'fullscreen';
-            
-            if (currentAdMode === 'static') {
-                modeBadge.innerHTML = '📦 STATIC MODE';
-                modeBadge.style.background = "#2c3152";
-                modeHint.innerHTML = '📦 static banner mode';
-                addLog(`🎲 Random mode: STATIC`);
-                
-                // Reset static container to show placeholder
-                const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
-                if (container) {
-                    container.innerHTML = '<div class="ad-placeholder">✨ Click button to load banner ad</div>';
-                }
-            } else {
-                modeBadge.innerHTML = '🎬 FULLSCREEN MODE';
-                modeBadge.style.background = "#7F4E2E";
-                modeHint.innerHTML = '🎬 rewarded video mode';
-                addLog(`🎲 Random mode: FULLSCREEN`);
-                
-                // Show fullscreen mode message in static container
-                const container = document.getElementById(`tads-container-${STATIC_WIDGET_ID}`);
-                if (container) {
-                    container.innerHTML = '<div class="ad-placeholder">🎬 Fullscreen mode active<br>Click button for rewarded ad</div>';
-                }
-            }
-        }
-        
-        // Initialize everything
-        async function initialize() {
-            addLog("Initializing Random Ad TMA...");
-            
-            // Initialize Telegram
-            initTelegramWebApp();
-            
-            // Wait for tads library to load
-            let retries = 0;
-            while (!window.tads && retries < 20) {
-                await new Promise(r => setTimeout(r, 200));
-                retries++;
-            }
-            
-            if (window.tads) {
-                addLog("✅ tads.me library loaded");
-                initStaticController();
-                initFullscreenController();
-            } else {
-                addLog("⚠️ tads library not loaded - check internet connection", true);
-            }
-            
-            // Initial random mode
-            randomizeAdMode();
-            addLog("Ready! Click REROLL to change ad type");
-        }
-        
-        // Event listeners
-        spinBtn.addEventListener('click', () => {
-            randomizeAdMode();
-            if (tgWebApp) {
-                tgWebApp.HapticFeedback.impactOccurred('light');
-            }
-            spinBtn.style.transform = 'scale(0.96)';
-            setTimeout(() => spinBtn.style.transform = '', 120);
-        });
-        
-        triggerBtn.addEventListener('click', () => {
-            triggerCurrentAd();
-        });
-        
-        // Start the app
-        initialize();
-        
-        // Telegram ready
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-        }
-    })();
-</script>
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Loading ad...';
+                await loadAd(widgetRaw, adType, rewardType);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Load Ad';
+            });
+
+            // initial default
+            setActiveWidgetUI('9642');
+            widgetIdInput.value = '9643';
+            nameInput.value = 'Personal blog';
+            descInput.value = 'Blog widget from dashboard #9673— Personal blog (TGB)';
+
+            // check tads on load
+            window.addEventListener('load', () => {
+                debugLog('Page fully loaded');
+                waitForTads(5000).catch(e => debugLog('tads not ready after load', e.message));
+            });
+        })();
+    </script>
 </body>
-</html>                
+</html>
+
+                                                
+                    
+                        
+        
+        
+                    
+                        
+        
+                       
+                       
+                        
