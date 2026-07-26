@@ -322,7 +322,7 @@
             // State
             let currentAdController = null;
             let currentWidgetId = '9642';
-            let noAdsHandled = false;
+            let noAdsHandled = true;
 
             // ---------- UI Helpers ----------
             function showMessage(type, text) {
@@ -440,7 +440,7 @@
                     const controller = window.tads.init({
                         widgetId: normalizedId,
                         type: adType,
-                        debug: true,        // set to false for cleaner production, logs are handled by us
+                        debug: false,        // set to false for cleaner production, logs are handled by us
                         onClickReward: onClickReward,
                         onShowReward: onShowReward,
                         onAdsNotFound: onAdsNotFound
