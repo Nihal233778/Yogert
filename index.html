@@ -1,5 +1,5 @@
-                
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,13 +7,8 @@
     <title>tads Publisher TMA · Personal blog widgets</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
-  
-  
-  
     <!-- tads widget (must be loaded before usage) -->
     <script src="https://w.tads.me/widget.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
     <style>
         * {
             box-sizing: border-box;
@@ -250,7 +245,7 @@
 
         <div class="form-group">
             <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #9673 (Personal blog)</textarea>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #9642 (Personal blog)</textarea>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Load Ad</button>
@@ -327,7 +322,7 @@
             // State
             let currentAdController = null;
             let currentWidgetId = '9642';
-            let noAdsHandled = true;
+            let noAdsHandled = false;
 
             // ---------- UI Helpers ----------
             function showMessage(type, text) {
@@ -445,7 +440,7 @@
                     const controller = window.tads.init({
                         widgetId: normalizedId,
                         type: adType,
-                        debug:false,        // set to false for cleaner production, logs are handled by us
+                        debug: false,        // set to false for cleaner production, logs are handled by us
                         onClickReward: onClickReward,
                         onShowReward: onShowReward,
                         onAdsNotFound: onAdsNotFound
@@ -549,9 +544,9 @@
 
             // initial default
             setActiveWidgetUI('9642');
-            widgetIdInput.value = '9643';
+            widgetIdInput.value = '9642';
             nameInput.value = 'Personal blog';
-            descInput.value = 'Blog widget from dashboard #9673— Personal blog (TGB)';
+            descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
 
             // check tads on load
             window.addEventListener('load', () => {
@@ -564,13 +559,4 @@
 </html>
 
                                                 
-                    
-                        
-        
-        
-                    
-                        
-        
-                       
-                       
-                        
+                                       
