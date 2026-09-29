@@ -402,7 +402,7 @@
                     setActiveWidgetUI(normalizedId);
 
                     // IMPORTANT: for static ads, create container with EXACT id format "tads-container-{widgetId}"
-                    if (adType === 'static') {
+                    if (adType === 'tgb') {
                         const requiredContainerId = `tads-container-${normalizedId}`;
                         debugLog(`Creating static container with ID: ${requiredContainerId}`);
                         staticContainer.innerHTML = `<div id="${requiredContainerId}" style="min-height:120px; width:100%;"></div>`;
@@ -427,7 +427,7 @@
                     let onShowReward = null;
 
                     if (rewardType === 'rewarded') {
-                        if (adType === 'static') {
+                        if (adType === 'tgb') {
                             onClickReward = (adId, extra) => {
                                 debugLog(`🎁 Click reward received! adId: ${adId}`, extra);
                                 showMessage('success', `🎉 Click reward granted for #${normalizedId}`);
