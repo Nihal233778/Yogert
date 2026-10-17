@@ -258,7 +258,7 @@
     <div id="adSection" class="hidden">
         <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#12660</span>
+            <span id="activeWidgetBadge" class="widget-badge">#9642</span>
         </h2>
         <div id="staticAdContainer"></div>
         <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
@@ -443,7 +443,7 @@
                     debugLog(`Initializing tads with widgetId=${normalizedId}, type=${adType}`);
                     const controller = window.tads.init({
                         widgetId: normalizedId,
-                        type: 'static',
+                        type: 'adtype',
                         debug: false,       // set to false for cleaner production, logs are handled by us
                         onClickReward: onClickReward,
                         onShowReward: onShowReward,
