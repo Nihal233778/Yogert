@@ -216,14 +216,14 @@
     <div id="debugContainer" class="debug-box hidden"></div>
 
     <div class="quick-select">
-        <div class="widget-btn" data-widget="12694" data-name="Personal blog">📰 #12694· Personal blog</div>
-        <div class="widget-btn" data-widget="12695" data-name="Personal blog1">✍️ #12695-Personal blog1</div>
+        <div class="widget-btn" data-widget="13287" data-name="Personal blog">📰 #13287· Personal blog</div>
+        <div class="widget-btn" data-widget="13288" data-name="Personal blog1">✍️ #13288-Personal blog1</div>
     </div>
 
     <form id="adForm">
         <div class="form-group">
             <label for="widgetId">🆔 Widget ID *</label>
-            <input type="text" id="widgetId" name="widgetId" required value="12694" placeholder="12694or 12695">
+            <input type="text" id="widgetId" name="widgetId" required value="13" placeholder="12694or 12695">
         </div>
 
         <div class="form-group">
@@ -249,7 +249,7 @@
 
         <div class="form-group">
             <label for="description">📝 Description</label>
-            <textarea id="description" name="description">Blog widget from tads dashboard — #12659 (Personal blog)</textarea>
+            <textarea id="description" name="description">Blog widget from tads dashboard — #13287(Personal blog)</textarea>
         </div>
 
         <button type="submit" id="submitBtn">🚀 Load Ad</button>
@@ -258,7 +258,7 @@
     <div id="adSection" class="hidden">
         <h2 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             🎯 Ad Preview 
-            <span id="activeWidgetBadge" class="widget-badge">#12694</span>
+            <span id="activeWidgetBadge" class="widget-badge">#13287</span>
         </h2>
         <div id="staticAdContainer"></div>
         <button id="fullscreenTrigger" class="hidden">✨ Show Fullscreen Ad</button>
@@ -325,7 +325,7 @@
 
             // State
             let currentAdController = null;
-            let currentWidgetId = '12694';
+            let currentWidgetId = '13287;
             let noAdsHandled = false;
 
             // ---------- UI Helpers ----------
@@ -518,8 +518,8 @@
                     if (wid) {
                         widgetIdInput.value = wid;
                         nameInput.value = wName || '';
-                        if (wid === '12694') descInput.value = 'Blog widget from dashboard #12694 — Personal blog (TGB)';
-                        else if (wid === '12695') descInput.value = 'Blog widget from dashboard #12695- Personal blog1 (TGB)';
+                        if (wid === '13287') descInput.value = 'Blog widget from dashboard #12694 — Personal blog (TGB)';
+                        else if (wid === '13288') descInput.value = 'Blog widget from dashboard #12695- Personal blog1 (TGB)';
                         setActiveWidgetUI(wid);
                         showMessage('success', `Selected ${wName} (#${wid})`);
                         resetAdUI();   // clear previous ad preview
@@ -547,8 +547,8 @@
             });
 
             // initial default
-            setActiveWidgetUI('12694');
-            widgetIdInput.value = '12695';
+            setActiveWidgetUI('13287');
+            widgetIdInput.value = '13288';
             nameInput.value = 'Personal blog';
             descInput.value = 'Blog widget from dashboard #9642— Personal blog (TGB)';
 
